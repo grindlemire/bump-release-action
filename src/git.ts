@@ -67,6 +67,7 @@ export async function pushVersionBranch(option: Option, config: Config, version:
         await checkoutBranch(branch, has == false);
         await exec.exec("git fetch -p");
         await mergeBranch(config.branch.baseBranch);
+        await exec.exec(`git pull origin ${config.branch.baseBranch}`);
         await exec.exec(`git push ${remote} HEAD:${branch}`);
         await checkoutBranch(config.branch.baseBranch, false);
     }
@@ -80,6 +81,7 @@ export async function pushVersionBranch(option: Option, config: Config, version:
         await checkoutBranch(branch, has == false);
         await exec.exec("git fetch -p");
         await mergeBranch(config.branch.baseBranch);
+        await exec.exec(`git pull origin ${config.branch.baseBranch}`);
         await exec.exec(`git push ${remote} HEAD:${branch}`);
         await checkoutBranch(config.branch.baseBranch, false);
     }
