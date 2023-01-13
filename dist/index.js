@@ -520,7 +520,7 @@ async function echoCurrentBranch() {
 exports.echoCurrentBranch = echoCurrentBranch;
 async function checkoutBranch(branch, create) {
     if (create) {
-        await exec.exec(`git checkout -b ${branch}`);
+        await exec.exec(`git checkout --track origin/${branch}`);
     }
     else {
         await exec.exec(`git checkout ${branch}`);

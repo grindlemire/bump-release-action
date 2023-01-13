@@ -19,7 +19,7 @@ export async function echoCurrentBranch(): Promise<string> {
 
 export async function checkoutBranch(branch: string, create: boolean) {
     if (create) {
-        await exec.exec(`git checkout -b ${branch}`);
+        await exec.exec(`git checkout --track origin/${branch}`);
     } else {
         await exec.exec(`git checkout ${branch}`);
     }
