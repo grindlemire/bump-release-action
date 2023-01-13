@@ -528,8 +528,13 @@ async function checkoutBranch(branch, create) {
 }
 exports.checkoutBranch = checkoutBranch;
 async function checkoutTargetBranch(branch, create, hasRemote) {
-    if (create && hasRemote) {
-        await exec.exec(`git checkout --track origin/${branch}`);
+    if (create) {
+        if (hasRemote) {
+            await exec.exec(`git checkout --track origin/${branch}`);
+        }
+        else {
+            await exec.exec(`git checkout -b ${branch}`);
+        }
     }
     else {
         await exec.exec(`git checkout ${branch}`);
