@@ -562,12 +562,10 @@ async function pushVersionBranch(option, config, version) {
         const branchPrefix = `${config.branch.versionBranchPrefix ?? ""}`;
         const branchPostfix = `${config.branch.versionBranchPostfix ?? ""}`;
         const branch = `${branchPrefix}${major}${branchPostfix}`;
+        await exec.exec("git fetch -p");
         const has = await hasBranch(branch);
         await checkoutBranch(branch, has == false);
-        await exec.exec("git fetch -p");
         await mergeBranch(config.branch.baseBranch);
-        await exec.exec("git config pull.rebase false");
-        await exec.exec(`git pull origin ${branch}`);
         await exec.exec(`git push ${remote} HEAD:${branch}`);
         await checkoutBranch(config.branch.baseBranch, false);
     }
@@ -577,12 +575,10 @@ async function pushVersionBranch(option, config, version) {
         const branchPrefix = `${config.branch.versionBranchPrefix ?? ""}`;
         const branchPostfix = `${config.branch.versionBranchPostfix ?? ""}`;
         const branch = `${branchPrefix}${major}.${minor}${branchPostfix}`;
+        await exec.exec("git fetch -p");
         const has = await hasBranch(branch);
         await checkoutBranch(branch, has == false);
-        await exec.exec("git fetch -p");
         await mergeBranch(config.branch.baseBranch);
-        await exec.exec("git config pull.rebase false");
-        await exec.exec(`git pull origin ${branch}`);
         await exec.exec(`git push ${remote} HEAD:${branch}`);
         await checkoutBranch(config.branch.baseBranch, false);
     }
