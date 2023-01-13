@@ -19,6 +19,14 @@ export async function echoCurrentBranch(): Promise<string> {
 
 export async function checkoutBranch(branch: string, create: boolean) {
     if (create) {
+        await exec.exec(`git checkout -b ${branch}`);
+    } else {
+        await exec.exec(`git checkout ${branch}`);
+    }
+}
+
+export async function checkoutTargetBranch(branch: string, create: boolean, hasRemote: boolean) {
+    if (create && hasRemote) {
         await exec.exec(`git checkout --track origin/${branch}`);
     } else {
         await exec.exec(`git checkout ${branch}`);
@@ -64,8 +72,9 @@ export async function pushVersionBranch(option: Option, config: Config, version:
         const branchPostfix = `${config.branch.versionBranchPostfix ?? ""}`;
         const branch = `${branchPrefix}${major}${branchPostfix}`;
         await exec.exec("git fetch -p");
+        const hasRemote = await hasRemoteBranch(branch);
         const has = await hasBranch(branch);
-        await checkoutBranch(branch, has == false);
+        await checkoutTargetBranch(branch, has == false, hasRemote);
         await mergeBranch(config.branch.baseBranch);
         await exec.exec(`git push ${remote} HEAD:${branch}`);
         await checkoutBranch(config.branch.baseBranch, false);
@@ -77,8 +86,9 @@ export async function pushVersionBranch(option: Option, config: Config, version:
         const branchPostfix = `${config.branch.versionBranchPostfix ?? ""}`;
         const branch = `${branchPrefix}${major}.${minor}${branchPostfix}`;
         await exec.exec("git fetch -p");
+        const hasRemote = await hasRemoteBranch(branch);
         const has = await hasBranch(branch);
-        await checkoutBranch(branch, has == false);
+        await checkoutTargetBranch(branch, has == false, hasRemote);
         await mergeBranch(config.branch.baseBranch);
         await exec.exec(`git push ${remote} HEAD:${branch}`);
         await checkoutBranch(config.branch.baseBranch, false);
@@ -102,6 +112,26 @@ async function hasBranch(branch: string): Promise<boolean> {
             .split(" ")
             .map((x) => x.trim())
             .indexOf(branch)
+    );
+}
+
+async function hasRemoteBranch(branch: string): Promise<boolean> {
+    const execOption: exec.ExecOptions = { ignoreReturnCode: true };
+    let stdout = "";
+    execOption.listeners = {
+        stdout: (data: Buffer) => {
+            stdout += data.toString();
+        },
+    };
+
+    await exec.exec("git branch -r", undefined, execOption);
+
+    return (
+        0 <=
+        stdout
+            .split(" ")
+            .map((x) => x.trim())
+            .indexOf(`origin/${branch}`)
     );
 }
 
